@@ -1,0 +1,14 @@
+package: github.com/gmuch/gmuch
+import:
+  - package: gopkg.in/stack.v1
+    ref:     0585967eab0016c8e4e2d55ac20585b469574cec
+  - package: golang.org/x/net
+    ref:     c2528b2dd8352441850638a8bb678c2ad056fd3e
+  - package: github.com/zenhack/go.notmuch
+    ref:     bbb4155d62523cc8295201e10bf311ce23140205
+  - package: github.com/namsral/flag
+    ref:     881a43080604bcf99ab1118a814d1cb2c268fc36
+  - package: github.com/go-kit/kit
+    ref:     069a0f8cf7ee45345296db0b153a0b9c7decb6b3
+  - package: gopkg.in/logfmt.v0
+    ref:     c50dc9aa845e681529d8e49d3dc11ec0195aacac

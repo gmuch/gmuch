@@ -1,0 +1,8 @@
+gmuch:
+  extends:
+    file: docker/compose/common.yml
+    service: gmuch
+  volumes:
+    - .:/go/src/github.com/gmuch/gmuch
+  ports:
+    - "7080:7080"

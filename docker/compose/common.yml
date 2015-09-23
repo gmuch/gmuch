@@ -1,0 +1,6 @@
+gmuch:
+  build: ../../
+  working_dir: /go/src/github.com/gmuch/gmuch/cmd/gmuch
+  command: gin --immediate --port 7080 --appPort 3000 run
+  environment:
+    - LISTEN=:3000

@@ -13,3 +13,11 @@ func EndpointenizeQuery(gmuch server.GmuchService) endpoint.Endpoint {
 		return gmuch.Query(req.Q, req.Offset, req.Limit)
 	}
 }
+
+// EndpointenizeThread transforms Thread to an Endpoint.
+func EndpointenizeThread(gmuch server.GmuchService) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		req := request.(server.ThreadRequest)
+		return gmuch.Thread(req.ID)
+	}
+}

@@ -1,9 +1,13 @@
 package gmuch
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/go-kit/kit/log"
+)
 
 func TestQuery(t *testing.T) {
-	g := New(dbPath)
+	g := New(dbPath, log.NewNopLogger())
 	qr, err := g.Query("", 0, 100)
 	if err != nil {
 		t.Fatalf("g.Query(%q, %d, %d): got error: %s", "", 0, 100, err)

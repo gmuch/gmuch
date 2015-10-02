@@ -49,7 +49,7 @@ func main() {
 	}, fieldKeys))
 
 	var g server.GmuchService
-	g = gmuch.New(*dbPath)
+	g = gmuch.New(*dbPath, logger)
 	g = server.LoggingMiddleware(logger)(g)
 	g = server.InstrumentingMiddleware(requestCount, requestLatency)(g)
 
@@ -60,6 +60,12 @@ func main() {
 		gmuch.EndpointenizeQuery(g),
 		shttp.DecodeQueryRequest,
 		shttp.EncodeQueryResponse,
+	))
+	mux.Handle("/thread", httptransport.NewServer(
+		root,
+		gmuch.EndpointenizeThread(g),
+		shttp.DecodeThreadRequest,
+		shttp.EncodeThreadResponse,
 	))
 	mux.Handle("/metrics", stdprometheus.Handler())
 

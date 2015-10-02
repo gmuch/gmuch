@@ -35,3 +35,20 @@ func (im instrumentingMiddleware) Query(qs string, offset, limit int) (*QueryRes
 	qr, err = im.GmuchService.Query(qs, offset, limit)
 	return qr, err
 }
+
+func (im instrumentingMiddleware) Thread(id string) (*ThreadResponse, error) {
+	var (
+		tr  *ThreadResponse
+		err error
+	)
+
+	defer func(begin time.Time) {
+		methodField := metrics.Field{Key: "method", Value: "thread"}
+		errorField := metrics.Field{Key: "error", Value: fmt.Sprintf("%v", err)}
+		im.requestCount.With(methodField).With(errorField).Add(1)
+		im.requestLatency.With(methodField).With(errorField).Observe(time.Since(begin))
+	}(time.Now())
+
+	tr, err = im.GmuchService.Thread(id)
+	return tr, err
+}

@@ -23,7 +23,21 @@ func DecodeQueryRequest(r *http.Request) (interface{}, error) {
 	return request, err
 }
 
-// EncodeQueryResponse encodes a request into JSON and writes it the http ResponseWriter.
+// EncodeQueryResponse encodes a request into JSON and writes it to the http
+// ResponseWriter.
 func EncodeQueryResponse(w http.ResponseWriter, response interface{}) error {
+	return json.NewEncoder(w).Encode(response)
+}
+
+// DecodeThreadRequest decodes a thread request from JSON.
+func DecodeThreadRequest(r *http.Request) (interface{}, error) {
+	var request server.ThreadRequest
+	err := json.NewDecoder(r.Body).Decode(&request)
+	return request, err
+}
+
+// EncodeThreadResponse encodes a request into JSON and writes it to the http
+// ResponseWriter.
+func EncodeThreadResponse(w http.ResponseWriter, response interface{}) error {
 	return json.NewEncoder(w).Encode(response)
 }

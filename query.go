@@ -2,12 +2,11 @@ package gmuch
 
 import (
 	"github.com/gmuch/gmuch/model"
-	"github.com/gmuch/gmuch/server"
 	"github.com/zenhack/go.notmuch"
 )
 
-// Query returns a QueryResponse for a given search query.
-func (g *Gmuch) Query(qs string, offset, limit int) (*server.QueryResponse, error) {
+// Query returns a []*model.Thread for a given search query.
+func (g *Gmuch) Query(qs string, offset, limit int) ([]*model.Thread, error) {
 	db, err := notmuch.Open(g.dbPath, notmuch.DBReadOnly)
 	if err != nil {
 		return nil, err
@@ -43,7 +42,5 @@ func (g *Gmuch) Query(qs string, offset, limit int) (*server.QueryResponse, erro
 		}
 	}
 
-	return &server.QueryResponse{
-		Threads: ts,
-	}, nil
+	return ts, nil
 }

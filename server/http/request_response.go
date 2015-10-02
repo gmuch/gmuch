@@ -1,10 +1,10 @@
-package server
+package http
 
 import "github.com/gmuch/gmuch/model"
 
 // QueryRequest represents a query request.
 type QueryRequest struct {
-	Q      string `json:"q"`
+	Query  string `json:"query"`
 	Offset int    `json:"offset"`
 	Limit  int    `json:"limit"`
 }
@@ -21,5 +21,5 @@ type ThreadRequest struct {
 
 // ThreadResponse represents a thread response.
 type ThreadResponse struct {
-	model.Thread
+	*model.Thread `json:"thread,omitempty"`
 }

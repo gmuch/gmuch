@@ -5,6 +5,7 @@ import (
 
 	stdlog "log"
 
+	"github.com/gmuch/gmuch/model"
 	"github.com/go-kit/kit/log"
 )
 
@@ -21,7 +22,7 @@ func LoggingMiddleware(logger log.Logger) ServiceMiddleware {
 }
 
 // Query wraps GmuchService.Query with logging logic.
-func (lm logMiddleware) Query(qs string, offset, limit int) (*QueryResponse, error) {
+func (lm logMiddleware) Query(qs string, offset, limit int) ([]*model.Thread, error) {
 	defer func(begin time.Time) {
 		if err := lm.logger.Log(
 			"method", "query",
@@ -38,7 +39,7 @@ func (lm logMiddleware) Query(qs string, offset, limit int) (*QueryResponse, err
 }
 
 // Thread wraps GmuchService.Thread with logging logic.
-func (lm logMiddleware) Thread(id string) (*ThreadResponse, error) {
+func (lm logMiddleware) Thread(id string) (*model.Thread, error) {
 	defer func(begin time.Time) {
 		if err := lm.logger.Log(
 			"method", "thread",

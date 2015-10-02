@@ -7,7 +7,6 @@ import (
 	"regexp"
 
 	"github.com/gmuch/gmuch/model"
-	"github.com/gmuch/gmuch/server"
 	"github.com/jordan-wright/email"
 	"github.com/zenhack/go.notmuch"
 )
@@ -27,8 +26,8 @@ var (
 	idRegex = regexp.MustCompile(`^[a-z0-9]+$`)
 )
 
-// Thread returns a *ThreadResponse for a given thread ID.
-func (g *Gmuch) Thread(id string) (*server.ThreadResponse, error) {
+// Thread returns a *model.Thread for a given thread ID.
+func (g *Gmuch) Thread(id string) (*model.Thread, error) {
 	if !idRegex.MatchString(id) {
 		return nil, ErrIDInvalid
 	}
@@ -53,7 +52,7 @@ func (g *Gmuch) Thread(id string) (*server.ThreadResponse, error) {
 		return nil, ErrIDNotFound
 	}
 	m, um := thread.Authors()
-	t := model.Thread{
+	t := &model.Thread{
 		ID:       thread.ID(),
 		Subject:  thread.Subject(),
 		Authors:  append(m, um...),
@@ -69,9 +68,7 @@ func (g *Gmuch) Thread(id string) (*server.ThreadResponse, error) {
 		t.Messages = append(t.Messages, e)
 	}
 
-	return &server.ThreadResponse{
-		Thread: t,
-	}, nil
+	return t, nil
 }
 
 func (g *Gmuch) getMessage(m *notmuch.Message) (*model.Message, error) {

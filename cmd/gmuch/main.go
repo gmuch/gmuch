@@ -57,13 +57,13 @@ func main() {
 	mux := http.NewServeMux()
 	mux.Handle("/query", httptransport.NewServer(
 		root,
-		gmuch.EndpointenizeQuery(g),
+		shttp.EndpointenizeQuery(g),
 		shttp.DecodeQueryRequest,
 		shttp.EncodeQueryResponse,
 	))
 	mux.Handle("/thread", httptransport.NewServer(
 		root,
-		gmuch.EndpointenizeThread(g),
+		shttp.EndpointenizeThread(g),
 		shttp.DecodeThreadRequest,
 		shttp.EncodeThreadResponse,
 	))

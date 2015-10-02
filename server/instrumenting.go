@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/gmuch/gmuch/model"
 	"github.com/go-kit/kit/metrics"
 )
 
@@ -13,15 +14,17 @@ type instrumentingMiddleware struct {
 	GmuchService
 }
 
+// InstrumentingMiddleware provides instrumentation for the service.
 func InstrumentingMiddleware(requestCount metrics.Counter, requestLatency metrics.TimeHistogram) ServiceMiddleware {
 	return func(next GmuchService) GmuchService {
 		return instrumentingMiddleware{requestCount, requestLatency, next}
 	}
 }
 
-func (im instrumentingMiddleware) Query(qs string, offset, limit int) (*QueryResponse, error) {
+// Query implements GmuchService.Query with instrumentation decorator.
+func (im instrumentingMiddleware) Query(qs string, offset, limit int) ([]*model.Thread, error) {
 	var (
-		qr  *QueryResponse
+		qr  []*model.Thread
 		err error
 	)
 
@@ -36,9 +39,10 @@ func (im instrumentingMiddleware) Query(qs string, offset, limit int) (*QueryRes
 	return qr, err
 }
 
-func (im instrumentingMiddleware) Thread(id string) (*ThreadResponse, error) {
+// Thread implements GmuchService.Thread with instrumentation decorator.
+func (im instrumentingMiddleware) Thread(id string) (*model.Thread, error) {
 	var (
-		tr  *ThreadResponse
+		tr  *model.Thread
 		err error
 	)
 

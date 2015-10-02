@@ -33,12 +33,12 @@ func TestThread(t *testing.T) {
 	t.Skip("the fixtures emails are not parsable by github.com/jordan-wright/email, must fix this issue")
 
 	g := New(dbPath, log.NewLogfmtLogger(os.Stderr))
-	qr, err := g.Query("*", 0, 1000)
+	ts, err := g.Query("*", 0, 1000)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	for _, thread := range qr.Threads {
+	for _, thread := range ts {
 		tr, err := g.Thread(thread.ID)
 		if err != nil {
 			t.Errorf("g.Thread(%q): got error: %s", thread.ID, err)

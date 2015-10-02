@@ -1,17 +1,49 @@
 package: github.com/gmuch/gmuch
 import:
-  - package: gopkg.in/stack.v1
-    ref:     0585967eab0016c8e4e2d55ac20585b469574cec
-  - package: golang.org/x/net
-    ref:     c2528b2dd8352441850638a8bb678c2ad056fd3e
+  # Dependencies
   - package: github.com/zenhack/go.notmuch
-    repo: https://github.com/kalbasit/go.notmuch.git
-    ref: finish_message
-  - package: github.com/namsral/flag
-    ref:     881a43080604bcf99ab1118a814d1cb2c268fc36
-  - package: github.com/go-kit/kit
-    ref:     069a0f8cf7ee45345296db0b153a0b9c7decb6b3
-  - package: gopkg.in/logfmt.v0
-    ref:     c50dc9aa845e681529d8e49d3dc11ec0195aacac
+    ref:     finish_message
+    repo:    https://github.com/kalbasit/go.notmuch.git
+  - package: google.golang.org/grpc
+    flatten: true
+    subpackages:
+      - .
+      - grpclog
+      - metadata
+      - credentials
+      - transport
+      - codes
+  - package: golang.org/x/net
+    flatten: true
   - package: github.com/jordan-wright/email
-    ref:     065af43fce517847a750d01a6d389d1a37e011b3
+  - package: github.com/namsral/flag
+  - package: github.com/prometheus/client_golang
+  - package: github.com/go-kit/kit
+    flatten: true
+
+
+  # Dependencies's dependencies
+  - package: bitbucket.org/ww/goautoneg
+    repo: https://bitbucket.org/ww/goautoneg
+    vcs: git
+    flatten: true
+  - package: gopkg.in/logfmt.v0
+    flatten: true
+  - package: github.com/prometheus/procfs
+    flatten: true
+  - package: github.com/codahale/hdrhistogram
+    flatten: true
+  - package: github.com/bradfitz/http2
+    flatten: true
+  - package: github.com/golang/protobuf
+    flatten: true
+  - package: github.com/prometheus/client_model
+    flatten: true
+  - package: github.com/matttproud/golang_protobuf_extensions
+    flatten: true
+  - package: github.com/beorn7/perks
+    flatten: true
+  - package: github.com/prometheus/common
+    flatten: true
+  - package: gopkg.in/stack.v1
+    flatten: true

@@ -19,4 +19,5 @@ RUN curl -L http://notmuchmail.org/releases/notmuch-${NOTMUCH_VERSION}.tar.gz | 
 ADD . /go/src/${GOAPP}
 WORKDIR /go/src/${GOAPP}
 
-RUN go install $(glide nv)
+RUN glide up \
+  && go install $(glide nv)

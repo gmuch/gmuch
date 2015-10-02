@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package grpc;
+
+service Gmuch {
+  rpc Query (QueryRequest) returns (QueryResponse) {};
+  rpc Thread (ThreadRequest) returns (ThreadResponse) {};
+}
+
+message QueryRequest {
+  string query = 1;
+  uint32 offset = 2;
+  uint32 limit = 3;
+}
+
+message QueryResponse {
+  repeated Thread threads = 1;
+}
+
+message ThreadRequest {
+  string id = 1;
+}
+
+message ThreadResponse {
+  Thread thread = 1;
+}
+
+message Thread {
+  string id = 1;
+  string subject = 2;
+  repeated string authors = 3;
+  repeated Message messages = 4;
+}
+
+message Message {
+  string id = 1;
+  string thread_id = 2;
+  repeated string tags = 3;
+  repeated Email emails = 4;
+}
+
+message Email {
+  string from = 1;
+  repeated string to = 2;
+  repeated string cc = 3;
+  repeated string bcc = 4;
+  string subject = 5;
+  string text = 6;
+  string html = 7;
+  repeated Pair headers = 8;
+  repeated Attachment attachments = 9;
+}
+
+message Pair {
+  string key = 1;
+  repeated string value = 2;
+}
+
+message Attachment {
+  string filename = 1;
+  repeated Pair headers = 2;
+  bytes content = 3;
+}

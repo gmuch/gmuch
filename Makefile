@@ -1,7 +1,7 @@
 .PHONY: test
 
 test: fixtures/database-v1
-	@go test -v -race -cover $(glide nv)
+	@go test -v -race -cover $(shell go list ./... | grep -v /vendor/)
 	@rm -rf fixtures/database-v1
 
 fixtures/database-v1: fixtures/database-v1.tar.xz

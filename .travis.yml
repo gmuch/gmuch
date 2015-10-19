@@ -1,3 +1,6 @@
+sudo: required
+services:
+  - docker
 language: go
 go:
   - 1.5
@@ -5,6 +8,10 @@ go:
 env:
   global:
     - GO15VENDOREXPERIMENT=1
+    # DOCKER_USER
+    - secure: kXmb3Np4SlS4wSzYuOSxYhF10mCqD90j1jdghm2nzAKOGjesOHh2rrgBeKG+6f5CNXKg+n4xPmokl3LhWKfeEfsS24aLf1PTtzeg9774OjCX3lrtA4iALODMxRlrLA+3ZeZGwfXngA0HAm/eBb80wxIAMB4izhaUqmgXDaZuSzmGYpQM/UmpVHWNBGNNWPCAGE/MGkvmtor8Pn1ryHOWpCVJ3I8gfDn/9vQnJ9k6spwSKMUi2EOV5bthhLr2b3esSbtr2Xf93Is1Gx7SSUEM5rEJ5X3oa0y3GPcrckcC7P3P4hIWh7WxnNZhkvNuCtzBwUdB9ztDft6vMbrb+4mm9n+awWZl60fr+/rxYL5ksGY1Japbq3kRbb14lbatjhngssh3LQ7hU6X5965lpdHTQSL2RRvoR368PA4X23+5bkMvJEySDRU7Fd3qzYPTekyPgvdtQ4LkByMz2+MyxOIfL+L4T8kwpeY6EUzVK3kYRwzVjJNcsPoBotzq4JRdilFCx4GUaVSo1yYiMQedQVmUf/c8WwVCRgQPsubSU5XAZ/qefdfSXvGtb96qCC7WtWkKN0TjoXVSlzDvpgGxkqeLlpHu753F4A5GyM5lpJ8Mq6l1Cjmc/mL89IzbLJwYpTUz/9MX92IhXlKx26b0Ad/QXbkhBcBaZbTtnXy3CSranCA=
+    # DOCKER_PASS
+    - secure: kcWcZQBjWu98Xq/0O82wFPx//pVXsi5q7ikjAktmJ+5AnkTbAVaFFuSBptH114S3RNvp3bdIVZxHjwwCm19gCqUZVQ5GtQsuO8pMDeFyLHV9ABp7Nc5xdRAF36D9ktersgxheHZDQzTRUHBJ+sBLNx1moVcfraMmPGUeqN6A5eSSfc03XRq5Na3gZeZVwJ1ANbsVVx1kMDaW/99TRu5vHT5rpH2r7LmsZDMMu3OOdivzWD5oLcqS32Cp2glD3VIIPjygiOgiDbF1FomBj4SQGPcHLZeDfNlqwAR00k0622s6GTJfMOwk+f1ngFWLohuiQtvpO7qZWkF3p8eBlJHKcJhmUM8OCOFwQ30US9tStUEhPARGwWTwe85buvkOBcYs4mNoQs67oOdenZV+Fo+jXoey8fy2QHUsCBXhR/oVNCngWAcu2amkGgvsxf+1MKGKRv4oNOI6tsS1MN5PkVYsgxAtjWu2m1wosilQdyD4ocL7mKCZEQCg9N0Km2xlF64hcWZ5Sr7js2gMgCV6nW+CnK51Enz/qhFiq/sAAMTtDJRP5gdP20ycSpikMpEKpUV6ZVtWTShIYUJN7uSVJnYE9xgdia474Sij1xrgtA8fjTQRXSOPf5G6plRDcF80KcgiFmN1nzM3ZcS3PrOLnHfw87SaFanGvFsakL/avW+fgO4=
   matrix:
     - notmuch_branch=release
     - notmuch_branch=master
@@ -16,18 +23,8 @@ before_install:
   - uname -a
   - cat /etc/lsb-release
   - go get -u golang.org/x/tools/cmd/cover
-  - sudo apt-get update -qq
-  - sudo apt-get install dtach libxapian-dev libgmime-2.6-dev libtalloc-dev python-sphinx ruby-dev
-
-  # Notmuch requires zlib 1.2.5.2, unfortunately travis runs on Ubuntu 12.04LTS which
-  # ships with zlib 1.2.3.3. We need to update to zlib 1.2.5.2 to be able to build.
-  # TODO: Watch https://github.com/travis-ci/travis-ci/issues/2046 and remove
-  #       this hack once travis-ci switches to Ubuntu 14.04
-  - wget 'https://github.com/notmuch/travis-files/raw/master/zlib1g-dev_1.2.8.dfsg-1ubuntu1_amd64.deb'
-  - wget 'https://github.com/notmuch/travis-files/raw/master/zlib1g_1.2.8.dfsg-1ubuntu1_amd64.deb'
-  - sudo dpkg -i zlib1g-dev_1.2.8.dfsg-1ubuntu1_amd64.deb zlib1g_1.2.8.dfsg-1ubuntu1_amd64.deb
-  - sudo apt-get install -f
-
+  - sudo apt-get update
+  - sudo apt-get install -y --no-install-recommends libxapian-dev libgmime-2.6-dev libtalloc-dev zlib1g-dev python-sphinx
   - git clone --depth=50 https://github.com/notmuch/notmuch.git -b $notmuch_branch
   - pushd notmuch
   - ./configure --prefix=/usr
@@ -35,3 +32,10 @@ before_install:
   - popd
   - sudo rm -rf notmuch
 script: make test
+after_success:
+  if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_GO_VERSION}" = "1.5" ]] && [[ "${notmuch_branch}" = "release" ]]; then
+    curl -LO https://github.com/grammarly/rocker/releases/download/0.2.2/rocker-0.2.2_linux_amd64.tar.gz;
+    tar -xf rocker-0.2.2_linux_amd64.tar.gz;
+    sudo mv rocker /usr/bin/rocker;
+    rocker build --var NOTMUCH_VERSION=$(cat version | sed -e 's:~::g') --var TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER --var TRAVIS_COMMIT=${TRAVIS_COMMIT::8} --push --auth $DOCKER_USER:$DOCKER_PASS;
+  fi

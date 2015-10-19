@@ -1,4 +1,4 @@
-REQUIRE ["NOTMUCH_VERSION", "TRAVIS_COMMIT", "TRAVIS_BUILD_NUMBER"]
+REQUIRE ["NOTMUCH_VERSION", "COMMIT", "BUILD_NUMBER"]
 
 ###################
 # Initial build image
@@ -14,22 +14,25 @@ RUN apt-get update \
     libtalloc-dev \
     zlib1g-dev \
     python-sphinx \
+    xz-utils \
 	&& rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/src \
-  && git clone --branch=release https://github.com/notmuch/notmuch.git /usr/src/notmuch \
-  && cd /usr/src/notmuch \
+  && curl -L notmuch.tar.gz https://github.com/notmuch/notmuch/archive/${NOTMUCH_VERSION}.tar.gz | tar -C /usr/src -xzf - \
+  && cd /usr/src/notmuch-${NOTMUCH_VERSION} \
   && ./configure --prefix=/usr \
   && make install
 
-MOUNT .:/go/src/github.com/gmuch/gmuch
-RUN go install github.com/gmuch/gmuch/cmd/...
+COPY . /go/src/github.com/gmuch/gmuch
+WORKDIR /go/src/github.com/gmuch/gmuch
+RUN make test
+RUN make install
 
 ###################
 # Export Copy tools
 
-MOUNT ../../kalbasit/docker-images/tools/deps.sh:/bin/deps
-MOUNT ../../kalbasit/docker-images/tools/copy.sh:/bin/copy
+COPY tools/deps.sh /bin/deps
+COPY tools/copy.sh /bin/copy
 
 RUN mkdir -p /workspace \
   && copy /workspace /go/bin/gmuch:/bin/gmuch $(deps /go/bin/gmuch)
@@ -49,5 +52,5 @@ CMD ["gmuch", "-db-path", "/mail"]
 ###################
 # Push the image
 
-PUSH gmuch/gmuch:{{ .NOTMUCH_VERSION }}-{{ .TRAVIS_BUILD_NUMBER }}-{{ .TRAVIS_COMMIT }}
+PUSH gmuch/gmuch:{{ .NOTMUCH_VERSION }}-{{ .BUILD_NUMBER }}-{{ .COMMIT }}
 PUSH gmuch/gmuch:latest

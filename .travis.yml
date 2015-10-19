@@ -8,6 +8,10 @@ go:
 env:
   global:
     - GO15VENDOREXPERIMENT=1
+    - ROCKER_VERSION=0.2.2
+    - COMMIT=${TRAVIS_COMMIT::8}
+    - ROCKER_ARGS=
+    - NOTMUCH_VERSION=0.20.2
     # DOCKER_USER
     - secure: kXmb3Np4SlS4wSzYuOSxYhF10mCqD90j1jdghm2nzAKOGjesOHh2rrgBeKG+6f5CNXKg+n4xPmokl3LhWKfeEfsS24aLf1PTtzeg9774OjCX3lrtA4iALODMxRlrLA+3ZeZGwfXngA0HAm/eBb80wxIAMB4izhaUqmgXDaZuSzmGYpQM/UmpVHWNBGNNWPCAGE/MGkvmtor8Pn1ryHOWpCVJ3I8gfDn/9vQnJ9k6spwSKMUi2EOV5bthhLr2b3esSbtr2Xf93Is1Gx7SSUEM5rEJ5X3oa0y3GPcrckcC7P3P4hIWh7WxnNZhkvNuCtzBwUdB9ztDft6vMbrb+4mm9n+awWZl60fr+/rxYL5ksGY1Japbq3kRbb14lbatjhngssh3LQ7hU6X5965lpdHTQSL2RRvoR368PA4X23+5bkMvJEySDRU7Fd3qzYPTekyPgvdtQ4LkByMz2+MyxOIfL+L4T8kwpeY6EUzVK3kYRwzVjJNcsPoBotzq4JRdilFCx4GUaVSo1yYiMQedQVmUf/c8WwVCRgQPsubSU5XAZ/qefdfSXvGtb96qCC7WtWkKN0TjoXVSlzDvpgGxkqeLlpHu753F4A5GyM5lpJ8Mq6l1Cjmc/mL89IzbLJwYpTUz/9MX92IhXlKx26b0Ad/QXbkhBcBaZbTtnXy3CSranCA=
     # DOCKER_PASS
@@ -22,20 +26,8 @@ matrix:
 before_install:
   - uname -a
   - cat /etc/lsb-release
-  - go get -u golang.org/x/tools/cmd/cover
-  - sudo apt-get update
-  - sudo apt-get install -y --no-install-recommends libxapian-dev libgmime-2.6-dev libtalloc-dev zlib1g-dev python-sphinx
-  - git clone --depth=50 https://github.com/notmuch/notmuch.git -b $notmuch_branch
-  - pushd notmuch
-  - ./configure --prefix=/usr
-  - sudo make install
-  - popd
-  - sudo rm -rf notmuch
-script: make test
-after_success:
-  if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_GO_VERSION}" = "1.5" ]] && [[ "${notmuch_branch}" = "release" ]]; then
-    curl -LO https://github.com/grammarly/rocker/releases/download/0.2.2/rocker-0.2.2_linux_amd64.tar.gz;
-    tar -xf rocker-0.2.2_linux_amd64.tar.gz;
-    sudo mv rocker /usr/bin/rocker;
-    rocker build --var NOTMUCH_VERSION=$(cat version | sed -e 's:~::g') --var TRAVIS_BUILD_NUMBER=$TRAVIS_BUILD_NUMBER --var TRAVIS_COMMIT=${TRAVIS_COMMIT::8} --push --auth $DOCKER_USER:$DOCKER_PASS;
-  fi
+  - curl -L https://github.com/grammarly/rocker/releases/download/${ROCKER_VERSION}/rocker-${ROCKER_VERSION}_linux_amd64.tar.gz | sudo tar -C /usr/bin -xzf -
+  - if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_GO_VERSION}" = "1.5" ]] && [[ "${notmuch_branch}" = "release" ]]; then
+      export ROCKER_ARGS="--push --auth $DOCKER_USER:$DOCKER_PASS";
+    fi
+script: make ci

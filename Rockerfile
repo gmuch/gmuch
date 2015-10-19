@@ -1,0 +1,53 @@
+REQUIRE ["NOTMUCH_VERSION", "TRAVIS_COMMIT", "TRAVIS_BUILD_NUMBER"]
+
+###################
+# Initial build image
+
+FROM golang:1.5
+
+ENV GO15VENDOREXPERIMENT=1
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
+    libxapian-dev \
+    libgmime-2.6-dev \
+    libtalloc-dev \
+    zlib1g-dev \
+    python-sphinx \
+	&& rm -rf /var/lib/apt/lists/*
+
+RUN curl -Lo notmuch.tar.gz https://github.com/notmuch/notmuch/archive/${NOTMUCH_VERSION}.tar.gz \
+  && tar -xzf notmuch.tar.gz \
+  && cd notmuch-${NOTMUCH_VERSION} \
+  && ./configure --prefix=/usr \
+  && make install \
+  && rm -rf ../notmuch.tar.gz ../notmuch-${NOTMUCH_VERSION}
+
+RUN go get -u github.com/gmuch/gmuch/cmd/...
+
+###################
+# Export Copy tools
+
+MOUNT ../../kalbasit/docker-images/tools/deps.sh:/bin/deps
+MOUNT ../../kalbasit/docker-images/tools/copy.sh:/bin/copy
+
+RUN mkdir -p /workspace \
+  && copy /workspace /go/bin/gmuch:/bin/gmuch $(deps /go/bin/gmuch)
+EXPORT /workspace/ /
+
+###################
+# Final build image
+
+FROM alpine
+IMPORT /
+VOLUME /mail
+EXPOSE 8000
+EXPOSE 8001
+EXPOSE 8002
+CMD ["gmuch", "-db-path", "/mail"]
+
+###################
+# Push the image
+
+PUSH gmuch/gmuch:{{ .NOTMUCH_VERSION }}-{{ .TRAVIS_BUILD_NUMBER }}-{{ .TRAVIS_COMMIT }}
+PUSH gmuch/gmuch:latest

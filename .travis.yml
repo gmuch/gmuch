@@ -1,33 +1,31 @@
 sudo: required
 services:
   - docker
-language: go
-go:
-  - 1.5
-  - tip
+language: c # The language is C as we build/test inside of docker
 env:
   global:
     - GO15VENDOREXPERIMENT=1
     - ROCKER_VERSION=0.2.2
     - COMMIT=${TRAVIS_COMMIT::8}
-    - ROCKER_ARGS=
     - NOTMUCH_VERSION=0.20.2
     # DOCKER_USER
     - secure: kXmb3Np4SlS4wSzYuOSxYhF10mCqD90j1jdghm2nzAKOGjesOHh2rrgBeKG+6f5CNXKg+n4xPmokl3LhWKfeEfsS24aLf1PTtzeg9774OjCX3lrtA4iALODMxRlrLA+3ZeZGwfXngA0HAm/eBb80wxIAMB4izhaUqmgXDaZuSzmGYpQM/UmpVHWNBGNNWPCAGE/MGkvmtor8Pn1ryHOWpCVJ3I8gfDn/9vQnJ9k6spwSKMUi2EOV5bthhLr2b3esSbtr2Xf93Is1Gx7SSUEM5rEJ5X3oa0y3GPcrckcC7P3P4hIWh7WxnNZhkvNuCtzBwUdB9ztDft6vMbrb+4mm9n+awWZl60fr+/rxYL5ksGY1Japbq3kRbb14lbatjhngssh3LQ7hU6X5965lpdHTQSL2RRvoR368PA4X23+5bkMvJEySDRU7Fd3qzYPTekyPgvdtQ4LkByMz2+MyxOIfL+L4T8kwpeY6EUzVK3kYRwzVjJNcsPoBotzq4JRdilFCx4GUaVSo1yYiMQedQVmUf/c8WwVCRgQPsubSU5XAZ/qefdfSXvGtb96qCC7WtWkKN0TjoXVSlzDvpgGxkqeLlpHu753F4A5GyM5lpJ8Mq6l1Cjmc/mL89IzbLJwYpTUz/9MX92IhXlKx26b0Ad/QXbkhBcBaZbTtnXy3CSranCA=
     # DOCKER_PASS
     - secure: kcWcZQBjWu98Xq/0O82wFPx//pVXsi5q7ikjAktmJ+5AnkTbAVaFFuSBptH114S3RNvp3bdIVZxHjwwCm19gCqUZVQ5GtQsuO8pMDeFyLHV9ABp7Nc5xdRAF36D9ktersgxheHZDQzTRUHBJ+sBLNx1moVcfraMmPGUeqN6A5eSSfc03XRq5Na3gZeZVwJ1ANbsVVx1kMDaW/99TRu5vHT5rpH2r7LmsZDMMu3OOdivzWD5oLcqS32Cp2glD3VIIPjygiOgiDbF1FomBj4SQGPcHLZeDfNlqwAR00k0622s6GTJfMOwk+f1ngFWLohuiQtvpO7qZWkF3p8eBlJHKcJhmUM8OCOFwQ30US9tStUEhPARGwWTwe85buvkOBcYs4mNoQs67oOdenZV+Fo+jXoey8fy2QHUsCBXhR/oVNCngWAcu2amkGgvsxf+1MKGKRv4oNOI6tsS1MN5PkVYsgxAtjWu2m1wosilQdyD4ocL7mKCZEQCg9N0Km2xlF64hcWZ5Sr7js2gMgCV6nW+CnK51Enz/qhFiq/sAAMTtDJRP5gdP20ycSpikMpEKpUV6ZVtWTShIYUJN7uSVJnYE9xgdia474Sij1xrgtA8fjTQRXSOPf5G6plRDcF80KcgiFmN1nzM3ZcS3PrOLnHfw87SaFanGvFsakL/avW+fgO4=
   matrix:
-    - notmuch_branch=release
-    - notmuch_branch=master
+    - GO_VERSION=1.5
+      NOTMUCH_BRANCH=master
+    - GO_VERSION=1.5
+      NOTMUCH_BRANCH=release
 matrix:
   allow_failures:
-    - go: tip
-    - env: notmuch_branch=master
-before_install:
+    - env: NOTMUCH_BRANCH=master
+before_script:
   - uname -a
   - cat /etc/lsb-release
   - curl -L https://github.com/grammarly/rocker/releases/download/${ROCKER_VERSION}/rocker-${ROCKER_VERSION}_linux_amd64.tar.gz | sudo tar -C /usr/bin -xzf -
-  - if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${TRAVIS_GO_VERSION}" = "1.5" ]] && [[ "${notmuch_branch}" = "release" ]]; then
+  - sed -e "s:^FROM golang.*:FROM golang:${GO_VERSION}:g" -i Dockerfile
+  - if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${GO_VERSION}" = "1.5" ]] && [[ "${NOTMUCH_BRANCH}" = "release" ]]; then
       export ROCKER_ARGS="--push --auth $DOCKER_USER:$DOCKER_PASS";
     fi
 script: make ci

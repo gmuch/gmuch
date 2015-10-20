@@ -21,11 +21,10 @@ matrix:
   allow_failures:
     - env: NOTMUCH_BRANCH=master
 before_script:
-  - uname -a
-  - cat /etc/lsb-release
   - curl -L https://github.com/grammarly/rocker/releases/download/${ROCKER_VERSION}/rocker-${ROCKER_VERSION}_linux_amd64.tar.gz | sudo tar -C /usr/bin -xzf -
-  - sed -e "s:^FROM golang.*:FROM golang:${GO_VERSION}:g" -i Dockerfile
-  - if [[ "${TRAVIS_PULL_REQUEST}" = "false" ]] && [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${GO_VERSION}" = "1.5" ]] && [[ "${NOTMUCH_BRANCH}" = "release" ]]; then
+  - sed -e "s:^FROM golang.*:FROM golang:$GO_VERSION:g" -i Dockerfile
+  - cat Dockerfile
+  - if [[ "${TRAVIS_BRANCH}" = "master" ]] && [[ "${GO_VERSION}" = "1.5" ]] && [[ "${NOTMUCH_BRANCH}" = "release" ]]; then
       export ROCKER_ARGS="--push --auth $DOCKER_USER:$DOCKER_PASS";
     fi
 script: make ci

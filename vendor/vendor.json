@@ -54,8 +54,8 @@
 		},
 		{
 			"path": "github.com/jordan-wright/email",
-			"revision": "065af43fce517847a750d01a6d389d1a37e011b3",
-			"revisionTime": "2015-09-12T20:40:22-05:00"
+			"revision": "f61123ea07e1921ac4f174e8c42225fd39bd6c6a",
+			"revisionTime": "2015-10-16T12:35:57-05:00"
 		},
 		{
 			"path": "github.com/matttproud/golang_protobuf_extensions/pbutil",
@@ -94,8 +94,8 @@
 		},
 		{
 			"path": "github.com/zenhack/go.notmuch",
-			"revision": "4d46aa0f1f6816ade068a5688a7570d53754ecda",
-			"revisionTime": "2015-10-01T18:34:27-07:00"
+			"revision": "90635959145dae775661525aa57839c432c4cb13",
+			"revisionTime": "2015-10-19T01:32:00-04:00"
 		},
 		{
 			"path": "golang.org/x/net/context",

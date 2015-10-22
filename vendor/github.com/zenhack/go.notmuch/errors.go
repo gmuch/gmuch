@@ -68,9 +68,9 @@ var (
 	// ErrUnknownError is returned when notmuch returns NULL indicating an error.
 	ErrUnknownError = errors.New("unknown error occured")
 
-	// ErrNoReplies is returned if a message has no replies or if the message's C
+	// ErrNoRepliesOrPointerNotFromThread is returned if a message has no replies or if the message's C
 	// pointer did not come from a thread.
-	ErrNoReplies = errors.New("message has no replies")
+	ErrNoRepliesOrPointerNotFromThread = errors.New("message has no replies or message's pointer not from a thread")
 )
 
 // Notmuch returns NULL in several instances on out of memory errors. The

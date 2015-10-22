@@ -8,8 +8,6 @@ import (
 )
 
 func TestThreadIDValidation(t *testing.T) {
-	t.Skip("the fixtures emails are not parsable by github.com/jordan-wright/email, must fix this issue")
-
 	g := New(dbPath, log.NewNopLogger())
 	errTests := map[string]error{
 		"123":              ErrIDNotFound,
@@ -30,8 +28,6 @@ func TestThreadIDValidation(t *testing.T) {
 }
 
 func TestThread(t *testing.T) {
-	t.Skip("the fixtures emails are not parsable by github.com/jordan-wright/email, must fix this issue")
-
 	g := New(dbPath, log.NewLogfmtLogger(os.Stderr))
 	ts, err := g.Query("*", 0, 1000)
 	if err != nil {
